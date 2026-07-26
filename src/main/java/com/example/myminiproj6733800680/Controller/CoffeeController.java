@@ -2,6 +2,9 @@ package com.example.myminiproj6733800680.Controller;
 
 import com.example.myminiproj6733800680.Model.Coffee;
 import com.example.myminiproj6733800680.Service.CoffeeService;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -30,26 +33,36 @@ public class CoffeeController {
 
     // POST /coffees
     @PostMapping
-    public Coffee addCoffee(@RequestBody Coffee coffee) {
-        return coffeeService.addCoffee(coffee);
-    }
+    public ResponseEntity<Coffee> addCoffee(@RequestBody Coffee coffee) {
+
+    Coffee newCoffee = coffeeService.addCoffee(coffee);
+
+    return ResponseEntity.status(HttpStatus.CREATED)
+            .body(newCoffee);
+}
 
     // PUT /coffees/{id}
     @PutMapping("/{id}")
-    public Coffee updateCoffee(@PathVariable Long id,
-                               @RequestBody Coffee coffee) {
-        return coffeeService.updateCoffee(id, coffee);
-    }
+    public ResponseEntity<Coffee> updateCoffee(
+        @PathVariable Long id,
+        @RequestBody Coffee coffee) {
+
+    Coffee updated = coffeeService.updateCoffee(id, coffee);
+
+    if (updated == null)
+        return ResponseEntity.notFound().build();
+
+    return ResponseEntity.ok(updated);
+}
 
     // DELETE /coffees/{id}
     @DeleteMapping("/{id}")
-    public String deleteCoffee(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteCoffee(@PathVariable Long id) {
 
-        if (coffeeService.deleteCoffee(id)) {
-            return "Delete Success";
-        }
+    if (coffeeService.deleteCoffee(id))
+        return ResponseEntity.ok().build();
 
-        return "Coffee Not Found";
-    }
+    return ResponseEntity.notFound().build();
+}
 
 }
